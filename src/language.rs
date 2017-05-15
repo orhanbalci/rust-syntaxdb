@@ -1,8 +1,8 @@
 #[derive(Serialize, Deserialize)]
-pub struct Language<'a> {
+pub struct Language {
     id: i32,
-    language_name: &'a str,
+    language_name: String,
     position: i32,
-    language_version: &'a str,
-    language_permalink: &'a str,
+    language_version: String,
+    language_permalink: String,
 }
