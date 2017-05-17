@@ -1,10 +1,17 @@
 [package]
 name = "syntaxdb"
 version = "0.1.0"
-authors = ["orhanbalci <orhanbalci@gmail.com>"]
+authors = ["Orhan Balci <orhanbalci@gmail.com>"]
+description = "SyntaxDb rest API client"
+documentation = "http://orhanbalci.github.io/rust-syntaxdb"
+homepage= "https:/github.com/orhanbalci"
+repository = "https://github.com/orhanbalci/rust-syntaxdb.git"
+keywords = ["syntaxdb", "rest"]
+license  = "MIT"
+exclude = [".travis.yaml"]
 
 [dependencies]
-reqwest = "*"
+reqwest = "0.6"
 serde = "1.0"
 # serde_json = "1.0"
 serde_derive = "1.0"
