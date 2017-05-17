@@ -117,7 +117,7 @@ impl SyntaxDbClient {
                                      fields: Option<Vec<&str>>,
                                      limit: Option<i32>,
                                      sort: Option<&str>)
-                                     -> Result<Vec<Category>, reqwest::Error> {
+                                     -> Result<Vec<Concept>, reqwest::Error> {
         let base_url = format!("{}/languages/{}/concepts", BASE_API_URL, language_permalink);
         let mut url = url::Url::parse(&base_url).unwrap();
         if let Some(f) = fields {
@@ -142,11 +142,10 @@ impl SyntaxDbClient {
                                         fields: Option<Vec<&str>>,
                                         limit: Option<i32>)
                                         -> Result<Vec<Concept>, reqwest::Error> {
-        let base_url = format!("{}/languages/{}/concepts/search/{}",
+        let base_url = format!("{}/languages/{}/concepts/search",
                                BASE_API_URL,
-                               language_permalink,
-                               search);
-        let mut url = url::Url::parse(&base_url).unwrap();
+                               language_permalink);
+        let mut url = url::Url::parse_with_params(&base_url, &[("q", search)]).unwrap();
         if let Some(f) = fields {
             url.query_pairs_mut().append_pair("fields", &f.join(","));
         };
@@ -216,7 +215,7 @@ impl SyntaxDbClient {
                                                language_permalink: &str,
                                                concept_permalink: &str,
                                                fields: Option<Vec<&str>>)
-                                               -> Result<Vec<Concept>, reqwest::Error> {
+                                               -> Result<Concept, reqwest::Error> {
         let base_url = format!("{}/languages/{}/concepts/{}",
                                BASE_API_URL,
                                language_permalink,
@@ -239,7 +238,9 @@ mod tests {
                            None,
                            Some("language_name"))
             .unwrap();
-        assert_eq!(languages[0].language_name, "C");
+        if let Some(ref ln) = languages[0].language_name {
+            assert_eq!(ln, "C");
+        }
     }
 
     #[test]
@@ -248,9 +249,92 @@ mod tests {
         let languages = client
             .get_languages(None, Some(1), Some("language_name"))
             .unwrap();
-        let language = client
-            .get_language_by_permalink(&languages[0].language_permalink, None)
+        if let Some(ref lp) = languages[0].language_permalink {
+            let language = client.get_language_by_permalink(lp, None).unwrap();
+            assert_eq!(language.id.unwrap(), 2);
+        }
+    }
+
+    #[test]
+    fn get_language_categories() {
+        let client = SyntaxDbClient::new();
+        let categories = client
+            .get_language_categories("java", None, None, None)
             .unwrap();
-        assert_eq!(language.id, 2);
+        if let Some(ref cn) = categories[1].category_name {
+            assert_eq!(cn, "Variables");
+        }
+    }
+
+    #[test]
+    fn get_language_category_concepts() {
+
+        let client = SyntaxDbClient::new();
+        let concepts = client
+            .get_language_category_concepts("java", 2, None, None, None)
+            .unwrap();
+        if let Some(ref cn) = concepts[0].concept_name {
+            assert_eq!(cn, "Primitive Data Types");
+        }
+    }
+
+    #[test]
+    fn get_language_concepts() {
+        let client = SyntaxDbClient::new();
+        let concepts = client
+            .get_language_concepts("java", None, None, None)
+            .unwrap();
+        if let Some(ref cn) = concepts[0].concept_name {
+            assert_eq!(cn, "Print");
+        }
+    }
+
+    #[test]
+    fn search_language_concepts() {
+        let client = SyntaxDbClient::new();
+        let concepts = client
+            .search_language_concepts("java", "map", None, None)
+            .unwrap();
+        if let Some(ref cn) = concepts[0].concept_name {
+            assert_eq!(cn, "HashMaps");
+        }
+    }
+
+    #[test]
+    fn get_concepts() {
+        let client = SyntaxDbClient::new();
+        let concepts = client.get_concepts(None, None, None).unwrap();
+        if let Some(ref cn) = concepts[0].concept_name {
+            assert_eq!(cn, "Print");
+        }
+    }
+
+    #[test]
+    fn search_concepts() {
+        let client = SyntaxDbClient::new();
+        let concepts = client.search_concepts("variable", None, None).unwrap();
+        if let Some(ref cn) = concepts[0].concept_name {
+            assert_eq!(cn, "Variable Declaration");
+        }
+    }
+
+    #[test]
+    fn get_concept_by_id() {
+        let client = SyntaxDbClient::new();
+        let concept = client.get_concept_by_id(12, None).unwrap();
+        if let Some(ref cn) = concept.concept_name {
+            assert_eq!(cn, "While Loop");
+        }
+    }
+
+    #[test]
+    fn get_language_concepts_by_concept_id() {
+        let client = SyntaxDbClient::new();
+        let concept = client
+            .get_language_concepts_by_concept_id("java", "print", None)
+            .unwrap();
+        if let Some(ref cn) = concept.concept_name {
+            assert_eq!(cn, "Print");
+        }
     }
 }
