@@ -27,7 +27,7 @@ script:
   cargo build &&
   cargo test &&
   cargo bench &&
-  travis-cargo --only stable doc
+  travis-cargo --only stable doc --no-deps
 after_success:
 - travis-cargo --only stable doc-upload
 - cargo coveralls

@@ -1,3 +1,8 @@
+//! This library is a wrapper around SyntaxDB rest API. 
+//! SyntaxDB allows users to quickly look up syntax for programming languages. SyntaxDB is designed
+//! for programmers who often need to do a Google search for their syntax needs. Primary usage area
+//! for SyntaxDB is editor and IDE integrations. This library helps you if you plan to write an
+//! extension for an editor using Rust
 #[macro_use]
 extern crate serde_derive;
 
@@ -8,9 +13,9 @@ pub use language::Language;
 pub use concept::Concept;
 pub use category::Category;
 
-mod language;
-mod concept;
-mod category;
+pub mod language;
+pub mod concept;
+pub mod category;
 
 static BASE_API_URL: &'static str = "http://syntaxdb.com/api/v1";
 
@@ -23,6 +28,8 @@ impl SyntaxDbClient {
         SyntaxDbClient { client: reqwest::Client::new().unwrap() }
     }
 
+    /// The Languages endpoint returns all languages available on SyntaxCenter, sorted by position
+    /// by default.
     pub fn get_languages(&self,
                          fields: Option<Vec<&str>>,
                          limit: Option<i32>,
@@ -47,6 +54,7 @@ impl SyntaxDbClient {
         self.client.get(url.as_str()).send()?.json()
     }
 
+    /// Returns the language corresponding to the permalink along with its information.
     pub fn get_language_by_permalink<'a>(&self,
                                          language_permalink: &'a str,
                                          fields: Option<Vec<&str>>)
@@ -60,6 +68,8 @@ impl SyntaxDbClient {
         self.client.get(url.as_str()).send()?.json()
     }
 
+    /// The language categories endpoint returns all of the categories corresponding to the
+    /// language.
     pub fn get_language_categories<'a>(&self,
                                        language_permalink: &'a str,
                                        fields: Option<Vec<&str>>,
@@ -85,6 +95,8 @@ impl SyntaxDbClient {
         self.client.get(url.as_str()).send()?.json()
     }
 
+    /// The category concepts endpoint returns all concepts belonging to the category, sorted by
+    /// position by default. 
     pub fn get_language_category_concepts<'a>(&self,
                                               language_permalink: &'a str,
                                               category_id: i32,
@@ -112,6 +124,8 @@ impl SyntaxDbClient {
         self.client.get(url.as_str()).send()?.json()
     }
 
+    /// The language concepts endpoint returns all concepts belonging to the language, sorted by
+    /// position by default. 
     pub fn get_language_concepts<'a>(&self,
                                      language_permalink: &'a str,
                                      fields: Option<Vec<&str>>,
@@ -135,7 +149,8 @@ impl SyntaxDbClient {
         self.client.get(url.as_str()).send()?.json()
     }
 
-
+    /// This search language concepts endpoint returns all concepts within the specified language
+    /// that matches the query.
     pub fn search_language_concepts<'a>(&self,
                                         language_permalink: &'a str,
                                         search: &'a str,
@@ -159,6 +174,8 @@ impl SyntaxDbClient {
 
     }
 
+    /// The Concepts endpoint returns an array of concepts contained in SyntaxCenter. By default,
+    /// the array is limited to 20 concepts, sorted by ID in ascending order. 
     pub fn get_concepts(&self,
                         fields: Option<Vec<&str>>,
                         limit: Option<i32>,
@@ -181,6 +198,7 @@ impl SyntaxDbClient {
         self.client.get(url.as_str()).send()?.json()
     }
 
+    /// Full text search for matching concepts across the entire database.
     pub fn search_concepts<'a>(&self,
                                search: &'a str,
                                fields: Option<Vec<&str>>,
@@ -198,7 +216,8 @@ impl SyntaxDbClient {
 
         self.client.get(url.as_str()).send()?.json()
     }
-
+    
+    /// Returns the concept corresponding to the unique identifier.
     pub fn get_concept_by_id(&self,
                              concept_id: i32,
                              fields: Option<Vec<&str>>)
@@ -211,6 +230,8 @@ impl SyntaxDbClient {
         self.client.get(url.as_str()).send()?.json()
     }
 
+    /// The language concepts endpoint returns all concepts belonging to the language, sorted by
+    /// position by default. 
     pub fn get_language_concepts_by_concept_id(&self,
                                                language_permalink: &str,
                                                concept_permalink: &str,
@@ -227,6 +248,7 @@ impl SyntaxDbClient {
         self.client.get(url.unwrap().as_str()).send()?.json()
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::SyntaxDbClient;
