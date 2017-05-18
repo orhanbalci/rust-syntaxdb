@@ -3,4 +3,5 @@
 [![Coverage Status](https://coveralls.io/repos/github/orhanbalci/rust-syntaxdb/badge.svg?branch=master)](https://coveralls.io/github/orhanbalci/rust-syntaxdb?branch=master)
 ![License](https://img.shields.io/github/license/orhanbalci/rust-syntaxdb.svg)
 
-Rust client library for SyntaxDb API
+Rust client library for [SyntaxDB](https://syntaxdb.com) API
+
